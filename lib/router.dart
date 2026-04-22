@@ -3,6 +3,11 @@ import 'screens/home_screen.dart';
 import 'screens/framework_example_screen.dart';
 import 'screens/generic_list_screen.dart';
 import 'screens/generic_form_screen.dart';
+import 'portal/screens/portal_dashboard_screen.dart';
+import 'portal/screens/portal_asistencia_screen.dart';
+import 'portal/screens/portal_calificaciones_screen.dart';
+import 'portal/screens/portal_comunicados_screen.dart';
+import 'portal/screens/portal_perfil_screen.dart';
 
 // Schema inline para el formulario de representante (dentro de diálogos)
 final _representanteInlineSchema = [
@@ -218,6 +223,30 @@ final GoRouter appRouter = GoRouter(
         title: 'Evento', endpoint: 'events', entityId: state.pathParameters['id']!,
         schema: _eventoSchema,
       ),
+    ),
+
+    // ==========================================
+    // PORTAL DE REPRESENTANTES
+    // ==========================================
+    GoRoute(
+      path: '/portal',
+      builder: (context, state) => const PortalDashboardScreen(),
+    ),
+    GoRoute(
+      path: '/portal/asistencia',
+      builder: (context, state) => const PortalAsistenciaScreen(),
+    ),
+    GoRoute(
+      path: '/portal/calificaciones',
+      builder: (context, state) => const PortalCalificacionesScreen(),
+    ),
+    GoRoute(
+      path: '/portal/comunicados',
+      builder: (context, state) => const PortalComunicadosScreen(),
+    ),
+    GoRoute(
+      path: '/portal/perfil',
+      builder: (context, state) => const PortalPerfilScreen(),
     ),
   ],
 );
