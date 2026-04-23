@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sigma_frontend/portal/widgets/card/herocard.dart';
 import '../../sigma_theme.dart';
 import 'portal_widgets.dart';
 
@@ -38,7 +39,10 @@ class PortalShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.sizeOf(context).width >= 720;
-    return isDesktop ? _DesktopLayout(child: child, selected: _selectedIndex) : _MobileLayout(child: child, selected: _selectedIndex);
+    return child;
+    return isDesktop
+        ? _DesktopLayout(selected: _selectedIndex, child: child)
+        : _MobileLayout(selected: _selectedIndex, child: child);
   }
 }
 
@@ -86,29 +90,7 @@ class _Sidebar extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           // Alumno activo
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: SigmaColors.blue.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                LetterAvatar(letter: 'A', color: SigmaColors.teal, size: 34),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Ana Martínez', style: TextStyle(color: SigmaColors.snowWhite, fontWeight: FontWeight.w700, fontSize: 12), overflow: TextOverflow.ellipsis),
-                      Text('3er Grado · Sección A', style: TextStyle(color: Color(0xFF8899BB), fontSize: 10)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          StudentHeroCard(),
           const SizedBox(height: 16),
           // Nav items
           ...List.generate(_navItems.length, (i) {
@@ -180,23 +162,53 @@ class _SidebarItem extends StatelessWidget {
 // ── Desktop TopBar ────────────────────────────────────────────────────────────
 class PortalTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final String subtitle;
+  final String ?subtitle;
+  final Function ?onMenu;
 
-  const PortalTopBar({super.key, required this.title, required this.subtitle});
+  const PortalTopBar({super.key, required this.title,  this.subtitle, this.onMenu});
 
   @override
   Size get preferredSize => const Size.fromHeight(56);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: SigmaColors.surfaceCard,
+    return
+    AppBar(
+    //  backgroundColor: SigmaColors.surfaceCard,
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: ()  {
+          print("ijijijij");
+          if (this.onMenu!=null) this.onMenu!();
+        }
+      ),
+      actions: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Icon(Icons.notifications_none_rounded, color: SigmaColors.amber, size: 26),
+            Positioned(
+              top: -2, right: -2,
+              child: Container(
+                width: 8, height: 8,
+                decoration: const BoxDecoration(color: SigmaColors.red, shape: BoxShape.circle),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(width: 14),
+        LetterAvatar(letter: 'C', color: SigmaColors.blue, size: 34),
+      ],
+    );
+    Container(
+
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
           Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: SigmaColors.textPrimary)),
           const SizedBox(width: 8),
-          Text(subtitle, style: const TextStyle(fontSize: 14, color: SigmaColors.textSub)),
+          Text(subtitle??"", style: const TextStyle(fontSize: 14, color: SigmaColors.textSub)),
           const Spacer(),
           Stack(
             clipBehavior: Clip.none,

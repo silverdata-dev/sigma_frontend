@@ -1,10 +1,12 @@
-import 'dart:async';
-import 'package:uuid/uuid.dart';
 import '../core/framework_core.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'local/local_database.dart';
+import 'local/local_store.dart';
+import 'remote/remote_provider.dart';
+import 'sync/sync_queue.dart';
+import 'sync/sync_engine.dart';
+import 'base_repository.dart' show AppDeps, BaseRepository;
 
-// Entidad genérica para envolver datos
+/// Generic entity wrapper for JSON payloads from the API.
 class DynamicEntity implements FrameworkEntity {
   @override
   final String id;
@@ -16,86 +18,40 @@ class DynamicEntity implements FrameworkEntity {
   Map<String, dynamic> toJson() => data;
 }
 
-// Proveedor Remoto Básico
-class RemoteDataProvider implements DataProvider<DynamicEntity> {
-  final String endpoint;
-  final String baseUrl = "http://localhost:8000/api";
-  final StreamController<List<Map<String, dynamic>>> _streamController = StreamController.broadcast();
-
-  RemoteDataProvider(this.endpoint);
-
-  @override
-  Stream<List<Map<String, dynamic>>> get dataStream => _streamController.stream;
-
-  @override
-  Future<List<DynamicEntity>> getAll() async {
-    final response = await http.get(Uri.parse('$baseUrl/$endpoint/'));
-    if (response.statusCode == 200) {
-      Iterable l = json.decode(response.body);
-      final list = l.map((e) => DynamicEntity(id: e['id'] ?? const Uuid().v4(), data: e)).toList();
-      _streamController.add(list.map((e) => e.data).toList());
-      return list;
-    }
-    throw Exception('Error loading $endpoint');
-  }
-
-  @override
-  Future<DynamicEntity?> getById(String id) async {
-    final response = await http.get(Uri.parse('$baseUrl/$endpoint/$id'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return DynamicEntity(id: data['id'], data: data);
-    }
-    return null;
-  }
-
-  @override
-  Future<void> create(DynamicEntity entity) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/$endpoint/'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(entity.data),
-    );
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Create error: ${response.body}');
-    }
-    getAll(); // Update stream
-  }
-
-  @override
-  Future<void> update(DynamicEntity entity) async {
-    final response = await http.put(
-      Uri.parse('$baseUrl/$endpoint/${entity.id}'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(entity.data),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Update error: ${response.body}');
-    }
-    getAll(); // Update stream
-  }
-
-  @override
-  Future<void> delete(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/$endpoint/$id'));
-    if (response.statusCode != 200) {
-      throw Exception('Delete error: ${response.body}');
-    }
-    getAll(); // Update stream
-  }
-}
-
 class AppFramework {
   static final AppFramework _instance = AppFramework._internal();
   factory AppFramework() => _instance;
-  AppFramework._internal();
 
-  final Map<String, RemoteDataProvider> _providers = {};
+  final Map<String, LocalStore> _storeRegistry = {};
+  final Map<String, BaseRepository> _repositories = {};
+  late final Future<AppDeps> _deps;
 
-  RemoteDataProvider getProvider(String endpoint) {
-    if (!_providers.containsKey(endpoint)) {
-      _providers[endpoint] = RemoteDataProvider(endpoint);
-    }
-    return _providers[endpoint]!;
+  AppFramework._internal() {
+    _deps = _initialize();
+  }
+
+  Future<AppDeps> _initialize() async {
+    await LocalDatabase.instance;
+    final queue = await SyncQueue.create();
+    final remote = const RemoteProvider();
+    final engine = SyncEngine.create(
+      remote: remote,
+      queue: queue,
+      storeRegistry: _storeRegistry,
+    );
+    engine.start();
+    return AppDeps(syncQueue: queue, syncEngine: engine, remote: remote);
+  }
+
+  /// Returns a [BaseRepository] for the given endpoint. Synchronous — init happens lazily.
+  BaseRepository getRepository(String endpoint) {
+    return _repositories.putIfAbsent(
+      endpoint,
+      () => BaseRepository.create(
+        endpoint: endpoint,
+        deps: _deps,
+        storeRegistry: _storeRegistry,
+      ),
+    );
   }
 }

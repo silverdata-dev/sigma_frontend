@@ -3,13 +3,14 @@ import 'package:go_router/go_router.dart';
 import '../framework/core/form_controller.dart';
 import '../framework/ui/framework_form.dart';
 import '../framework/data/api_provider.dart';
+import '../framework/data/base_repository.dart';
 
 class GenericFormScreen extends StatefulWidget {
   final String title;
   final String endpoint;
   final String entityId;
   final List<Map<String, dynamic>> schema;
-  final Map<String, dynamic>? extraData; // Ej: Forzar rol en "Sujetos"
+  final Map<String, dynamic>? extraData;
 
   const GenericFormScreen({
     super.key,
@@ -25,8 +26,8 @@ class GenericFormScreen extends StatefulWidget {
 }
 
 class _GenericFormScreenState extends State<GenericFormScreen> {
-  late FormController _formController;
-  late RemoteDataProvider _provider;
+  late final FormController _formController;
+  late final BaseRepository _repository;
   bool _isLoading = false;
   bool _isSaving = false;
 
@@ -36,39 +37,32 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
   void initState() {
     super.initState();
     _formController = FormController();
-    _provider = AppFramework().getProvider(widget.endpoint);
-    
-    if (!isNew) {
-      _loadEntity();
-    }
+    _repository = AppFramework().getRepository(widget.endpoint);
+    if (!isNew) _loadEntity();
   }
 
   Future<void> _loadEntity() async {
     setState(() => _isLoading = true);
     try {
-      final entity = await _provider.getById(widget.entityId);
-      if (entity != null) {
-        entity.data.forEach((key, value) {
-          _formController.updateField(key, value);
-        });
+      final data = await _repository.findById(widget.entityId);
+      if (data != null) {
+        data.forEach((key, value) => _formController.updateField(key, value));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error al cargar: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _saveEntity() async {
     setState(() => _isSaving = true);
     try {
-      Map<String, dynamic> dataToSave = Map.from(_formController.data);
-      
-      // Aplicar datos extra forzados, como metadata_json={rol: 'Estudiante'}
+      final dataToSave = Map<String, dynamic>.from(_formController.data);
+
       if (widget.extraData != null) {
         widget.extraData!.forEach((key, value) {
           if (key.contains('.')) {
@@ -81,27 +75,23 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         });
       }
 
-      if (isNew) {
-        await _provider.create(DynamicEntity(id: '', data: dataToSave));
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Creado exitosamente')));
-          context.pop();
-        }
-      } else {
-        await _provider.update(DynamicEntity(id: widget.entityId, data: dataToSave));
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Actualizado exitosamente')));
-          context.pop();
-        }
+      if (!isNew) dataToSave['id'] = widget.entityId;
+
+      await _repository.save(dataToSave);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(isNew ? 'Creado exitosamente' : 'Actualizado exitosamente'),
+        ));
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -112,11 +102,15 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
         title: const Text('Confirmar'),
         content: const Text('¿Eliminar este registro permanentemente?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(ctx, true), 
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -125,19 +119,19 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
     if (confirm == true) {
       setState(() => _isSaving = true);
       try {
-        await _provider.delete(widget.entityId);
+        await _repository.delete(widget.entityId);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Eliminado exitosamente')));
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Eliminado exitosamente')));
           context.pop();
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
         }
       } finally {
-        if (mounted) {
-          setState(() => _isSaving = false);
-        }
+        if (mounted) setState(() => _isSaving = false);
       }
     }
   }
@@ -168,7 +162,8 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Card(
                 elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: FrameworkForm(
@@ -179,15 +174,19 @@ class _GenericFormScreenState extends State<GenericFormScreen> {
                 ),
               ),
             ),
-      floatingActionButton: _isLoading 
-        ? null 
-        : FloatingActionButton.extended(
-            onPressed: _isSaving ? null : _saveEntity,
-            icon: _isSaving 
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Icon(Icons.save),
-            label: Text(_isSaving ? 'Guardando...' : 'Guardar'),
-          ),
+      floatingActionButton: _isLoading
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _isSaving ? null : _saveEntity,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Icon(Icons.save),
+              label: Text(_isSaving ? 'Guardando...' : 'Guardar'),
+            ),
     );
   }
 }

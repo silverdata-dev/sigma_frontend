@@ -23,22 +23,18 @@ class PortalComunicadosScreen extends StatelessWidget {
 class _MobileComunicados extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const PortalMobileAppBar(),
-      backgroundColor: SigmaColors.surface,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Comunicados',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: SigmaColors.textPrimary)),
-            const SizedBox(height: 14),
-            ..._msgs.map((m) => MessageItem(
-              sender: m.$1, preview: m.$2, time: m.$3, unread: m.$4, avatarColor: m.$5,
-            )),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Comunicados',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: SigmaColors.textPrimary)),
+          const SizedBox(height: 14),
+          ..._msgs.map((m) => MessageItem(
+            sender: m.$1, preview: m.$2, time: m.$3, unread: m.$4, avatarColor: m.$5,
+          )),
+        ],
       ),
     );
   }
@@ -58,8 +54,9 @@ class _DesktopComunicados extends StatelessWidget {
             const Text('Comunicados',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: SigmaColors.textPrimary)),
             const SizedBox(height: 18),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 580),
+            Center(
+            //ConstrainedBox(
+              //constraints: const BoxConstraints(maxWidth: 580),
               child: Column(
                 children: _msgs.map((m) => MessageItem(
                   sender: m.$1, preview: m.$2, time: m.$3, unread: m.$4, avatarColor: m.$5,

@@ -8,6 +8,7 @@ import 'portal/screens/portal_asistencia_screen.dart';
 import 'portal/screens/portal_calificaciones_screen.dart';
 import 'portal/screens/portal_comunicados_screen.dart';
 import 'portal/screens/portal_perfil_screen.dart';
+import 'widgets/admin_shell.dart';
 
 // Schema inline para el formulario de representante (dentro de diálogos)
 final _representanteInlineSchema = [
@@ -81,80 +82,161 @@ final _eventoSchema = [
 ];
 
 // Configuración del enrutador central
-final GoRouter appRouter = GoRouter(
+final rerouter =  ()=> GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) =>
+      PortalDashboardScreen(),
+          //HomeScreen(),
+      /*const AdminShell(
+        currentRoute: '/',
+        child: HomeScreen(),
+      ),*/
     ),
     GoRoute(
       path: '/example',
-      builder: (context, state) => const FrameworkExampleScreen(),
+      builder: (context, state) =>
+          FrameworkExampleScreen(),
+      /*const AdminShell(
+        currentRoute: '/example',
+        child: FrameworkExampleScreen(),
+      ),*/
     ),
-    
+
     // --- ESTUDIANTES ---
     GoRoute(
       path: '/estudiantes',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Estudiantes', endpoint: 'subjects', routePrefix: '/estudiantes',
-        displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Estudiante',
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Estudiantes', endpoint: 'subjects', routePrefix: '/estudiantes',
+            displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Estudiante',
+          ),
+      /*const AdminShell(
+        currentRoute: '/estudiantes',
+        child: GenericListScreen(
+          title: 'Estudiantes', endpoint: 'subjects', routePrefix: '/estudiantes',
+          displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Estudiante',
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/estudiantes/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Estudiante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
-        schema: _estudianteSchema, extraData: const {'metadata_json.rol': 'Estudiante'},
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Estudiante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+            schema: _estudianteSchema, extraData: const {'metadata_json.rol': 'Estudiante'},
+          ),
+          /*
+          AdminShell(
+        currentRoute: '/estudiantes',
+        child: GenericFormScreen(
+          title: 'Estudiante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+          schema: _estudianteSchema, extraData: const {'metadata_json.rol': 'Estudiante'},
+        ),
+      ),*/
     ),
 
     // --- PROFESORES ---
     GoRoute(
       path: '/profesores',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Profesores', endpoint: 'subjects', routePrefix: '/profesores',
-        displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Profesor',
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Profesores', endpoint: 'subjects', routePrefix: '/profesores',
+            displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Profesor',
+          ),
+      /*
+      const AdminShell(
+        currentRoute: '/profesores',
+        child: GenericListScreen(
+          title: 'Profesores', endpoint: 'subjects', routePrefix: '/profesores',
+          displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Profesor',
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/profesores/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Profesor', endpoint: 'subjects', entityId: state.pathParameters['id']!,
-        schema: _personaSchema, extraData: const {'metadata_json.rol': 'Profesor'},
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Profesor', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+            schema: _personaSchema, extraData: const {'metadata_json.rol': 'Profesor'},
+          ),
+          /*AdminShell(
+        currentRoute: '/profesores',
+        child: GenericFormScreen(
+          title: 'Profesor', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+          schema: _personaSchema, extraData: const {'metadata_json.rol': 'Profesor'},
+        ),
+      ),*/
     ),
 
     // --- REPRESENTANTES ---
     GoRoute(
       path: '/representantes',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Representantes', endpoint: 'subjects', routePrefix: '/representantes',
-        displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Representante',
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Representantes', endpoint: 'subjects', routePrefix: '/representantes',
+            displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Representante',
+          ),
+      /*
+      const AdminShell(
+        currentRoute: '/representantes',
+        child: GenericListScreen(
+          title: 'Representantes', endpoint: 'subjects', routePrefix: '/representantes',
+          displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Representante',
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/representantes/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Representante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
-        schema: _personaSchema, extraData: const {'metadata_json.rol': 'Representante'},
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Representante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+            schema: _personaSchema, extraData: const {'metadata_json.rol': 'Representante'},
+          ),
+          /*
+          AdminShell(
+        currentRoute: '/representantes',
+        child: GenericFormScreen(
+          title: 'Representante', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+          schema: _personaSchema, extraData: const {'metadata_json.rol': 'Representante'},
+        ),
+      ),*/
     ),
 
     // --- OTROS EMPLEADOS ---
     GoRoute(
       path: '/empleados',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Otros Empleados', endpoint: 'subjects', routePrefix: '/empleados',
-        displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Empleado',
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Otros Empleados', endpoint: 'subjects', routePrefix: '/empleados',
+            displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Empleado',
+          ),
+      /*
+      const AdminShell(
+        currentRoute: '/empleados',
+        child: GenericListScreen(
+          title: 'Otros Empleados', endpoint: 'subjects', routePrefix: '/empleados',
+          displayFields: ['name', 'cedula'], filterKey: 'metadata_json.rol', filterValue: 'Empleado',
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/empleados/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Empleado', endpoint: 'subjects', entityId: state.pathParameters['id']!,
-        schema: _personaSchema, extraData: const {'metadata_json.rol': 'Empleado'},
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Empleado', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+            schema: _personaSchema, extraData: const {'metadata_json.rol': 'Empleado'},
+          ),
+          /*
+          AdminShell(
+        currentRoute: '/empleados',
+        child: GenericFormScreen(
+          title: 'Empleado', endpoint: 'subjects', entityId: state.pathParameters['id']!,
+          schema: _personaSchema, extraData: const {'metadata_json.rol': 'Empleado'},
+        ),
+      ),*/
     ),
 
     // ==========================================
@@ -164,65 +246,134 @@ final GoRouter appRouter = GoRouter(
     // --- PERIODOS ACADEMICOS ---
     GoRoute(
       path: '/periodos',
-      builder: (context, state) => const GenericListScreen(
+      builder: (context, state) =>
+      /*
+      const AdminShell(
+        currentRoute: '/periodos',
+        child: GenericListScreen(
+          title: 'Periodos Académicos', endpoint: 'periodos-academicos', routePrefix: '/periodos',
+          displayFields: ['name', 'status'],
+        ),
+      ),*/
+      GenericListScreen(
         title: 'Periodos Académicos', endpoint: 'periodos-academicos', routePrefix: '/periodos',
         displayFields: ['name', 'status'],
       ),
     ),
     GoRoute(
       path: '/periodos/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Periodo Académico', endpoint: 'periodos-academicos', entityId: state.pathParameters['id']!,
-        schema: _periodoSchema,
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Periodo Académico', endpoint: 'periodos-academicos', entityId: state.pathParameters['id']!,
+            schema: _periodoSchema,
+          ),
+          /*AdminShell(
+        currentRoute: '/periodos',
+        child: GenericFormScreen(
+          title: 'Periodo Académico', endpoint: 'periodos-academicos', entityId: state.pathParameters['id']!,
+          schema: _periodoSchema,
+        ),
+      ),*/
     ),
 
     // --- SECCIONES ---
     GoRoute(
       path: '/secciones',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Secciones', endpoint: 'secciones', routePrefix: '/secciones',
-        displayFields: ['name', 'grado'],
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Secciones', endpoint: 'secciones', routePrefix: '/secciones',
+            displayFields: ['name', 'grado'],
+          ),
+      /*
+      const AdminShell(
+        currentRoute: '/secciones',
+        child: GenericListScreen(
+          title: 'Secciones', endpoint: 'secciones', routePrefix: '/secciones',
+          displayFields: ['name', 'grado'],
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/secciones/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Sección', endpoint: 'secciones', entityId: state.pathParameters['id']!,
-        schema: _seccionSchema,
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Sección', endpoint: 'secciones', entityId: state.pathParameters['id']!,
+            schema: _seccionSchema,
+          ),
+          /*
+          AdminShell(
+        currentRoute: '/secciones',
+        child: GenericFormScreen(
+          title: 'Sección', endpoint: 'secciones', entityId: state.pathParameters['id']!,
+          schema: _seccionSchema,
+        ),
+      ),*/
     ),
 
     // --- ROLES (Seguridad) ---
     GoRoute(
       path: '/roles',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Asignación de Roles', endpoint: 'roles', routePrefix: '/roles',
-        displayFields: ['roletype_id', 'subject_id'],
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Asignación de Roles', endpoint: 'roles', routePrefix: '/roles',
+            displayFields: ['roletype_id', 'subject_id'],
+          ),
+      /*
+      const AdminShell(
+        currentRoute: '/roles',
+        child: GenericListScreen(
+          title: 'Asignación de Roles', endpoint: 'roles', routePrefix: '/roles',
+          displayFields: ['roletype_id', 'subject_id'],
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/roles/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Rol', endpoint: 'roles', entityId: state.pathParameters['id']!,
-        schema: _rolesSchema,
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Rol', endpoint: 'roles', entityId: state.pathParameters['id']!,
+            schema: _rolesSchema,
+          ),
+/*          AdminShell(
+        currentRoute: '/roles',
+        child: GenericFormScreen(
+          title: 'Rol', endpoint: 'roles', entityId: state.pathParameters['id']!,
+          schema: _rolesSchema,
+        ),
+      ),*/
     ),
 
     // --- EVENTOS (Auditoría / Calificaciones) ---
     GoRoute(
       path: '/eventos',
-      builder: (context, state) => const GenericListScreen(
-        title: 'Event Store', endpoint: 'events', routePrefix: '/eventos',
-        displayFields: ['type', 'recorded_at'],
-      ),
+      builder: (context, state) =>
+          GenericListScreen(
+            title: 'Event Store', endpoint: 'events', routePrefix: '/eventos',
+            displayFields: ['type', 'recorded_at'],
+          ),/*
+      const AdminShell(
+        currentRoute: '/eventos',
+        child: GenericListScreen(
+          title: 'Event Store', endpoint: 'events', routePrefix: '/eventos',
+          displayFields: ['type', 'recorded_at'],
+        ),
+      ),*/
     ),
     GoRoute(
       path: '/eventos/:id',
-      builder: (context, state) => GenericFormScreen(
-        title: 'Evento', endpoint: 'events', entityId: state.pathParameters['id']!,
-        schema: _eventoSchema,
-      ),
+      builder: (context, state) =>
+          GenericFormScreen(
+            title: 'Evento', endpoint: 'events', entityId: state.pathParameters['id']!,
+            schema: _eventoSchema,
+          ),
+          /*
+          AdminShell(
+        currentRoute: '/eventos',
+        child: GenericFormScreen(
+          title: 'Evento', endpoint: 'events', entityId: state.pathParameters['id']!,
+          schema: _eventoSchema,
+        ),
+      ),*/
     ),
 
     // ==========================================

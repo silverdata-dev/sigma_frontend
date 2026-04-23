@@ -3,6 +3,7 @@ import 'dart:async';
 /// Interfaz base para todas las entidades del framework.
 abstract class FrameworkEntity {
   String get id;
+
   Map<String, dynamic> toJson();
 }
 

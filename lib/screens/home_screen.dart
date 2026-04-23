@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'Sigma Admin',
+                        'Sigma Adminb',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -123,6 +123,51 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     context.push('/eventos');
+                  },
+                ),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+                  child: Text('PORTAL', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.grid_view_rounded),
+                  title: const Text('Dashboard'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/portal');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.schedule_rounded),
+                  title: const Text('Asistencia'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/portal/asistencia');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit_note_rounded),
+                  title: const Text('Calificaciones'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/portal/calificaciones');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.mail_outline_rounded),
+                  title: const Text('Comunicados'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/portal/comunicados');
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.account_circle_outlined),
+                  title: const Text('Perfil'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/portal/perfil');
                   },
                 ),
                 const Divider(),

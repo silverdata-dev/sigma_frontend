@@ -135,21 +135,19 @@ class _MobilePerfil extends StatelessWidget {
 class _DesktopPerfil extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: SigmaColors.surface,
-      appBar: const PortalTopBar(title: 'Perfil', subtitle: 'Abril 2026'),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(28),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _StudentCard(),
-              const SizedBox(height: 20),
-              _RepresentanteCard(),
-            ],
-          ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(28),
+      child:
+      Center(
+      //ConstrainedBox(
+      //  constraints: const BoxConstraints(maxWidth: 640),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _StudentCard(),
+            const SizedBox(height: 20),
+            _RepresentanteCard(),
+          ],
         ),
       ),
     );
